@@ -1,0 +1,189 @@
+language: "en-US"
+tone_instructions: "Be concise, practical, and constructive. Prioritize correctness, maintainability, accessibility, and clear user impact."
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - ".github/copilot-instructions.md"
+      - ".github/instructions/*.instructions.md"
+      - "docs/memory-bank/ARCHITECTURE.md"
+      - "docs/memory-bank/CONTRIBUTING.md"
+      - "docs/memory-bank/TROUBLESHOOTING.md"
+
+chat:
+  auto_reply: true
+  art: false
+
+
+reviews:
+  tools:
+    eslint:
+      enabled: true
+
+  profile: "chill"
+  request_changes_workflow: false
+
+  # Keep the summary useful, but avoid decorative extras.
+  high_level_summary: true
+  high_level_summary_in_walkthrough: true
+  high_level_summary_instructions: >
+    Summarize user-visible behavior changes, backend/API contract changes,
+    auth/security implications, risky CI or config changes, and whether meaningful
+    tests were added for changed high-risk logic. Ignore formatting-only churn,
+    mock/documentation-only changes, and non-functional refactors unless they hide
+    a concrete correctness or compatibility risk.
+
+  review_status: true
+  review_details: false
+  commit_status: true
+  fail_commit_status: false
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 5
+    drafts: false
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT MERGE"
+      - "SKIP"
+    base_branches:
+      - "develop"
+
+  collapse_walkthrough: true
+  changed_files_summary: true
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  auto_apply_labels: false
+  suggested_reviewers: false
+  auto_assign_reviewers: false
+  in_progress_fortune: false
+  poem: false
+  enable_prompt_for_ai_agents: false
+
+
+
+  # Review the repository broadly, then subtract noise.
+  path_filters:
+    - "**"
+
+    # Build / dependency / report noise
+    - "!dist/**"
+    - "!node_modules/**"
+    - "!playwright-report/**"
+    - "!blob-report/**"
+    - "!test-results/**"
+    - "!coverage/**"
+    - "!tsconfig.tsbuildinfo"
+    - "!pnpm-lock.yaml"
+    - "!**/*.lock"
+    - "!**/generated/**"
+    - "!storybook-static/**"
+    - "!build/**"
+
+    # Docs / local editor noise
+    - "!docs/**"
+    - "!spec/**"
+    - "!.cursor/**"
+    - "!.vscode/**"
+    - "!**/*.md"
+
+    # Mock / generated-like data that rarely deserves semantic review
+    - "!local-mocks/**"
+    - "!app/src/features/**/mocks/**"
+
+    # Static assets / styling
+    - "!app/src/assets/**"
+    - "!app/public/**"
+    - "!**/*.css"
+    - "!**/*.scss"
+    - "!**/*.sass"
+
+    # Preventive snapshot exclusions
+    - "!**/__snapshots__/**"
+    - "!**/*.snap"
+
+    # deprecated features
+    - "!archive_deprecated/**"
+
+
+
+  path_instructions:
+    - path: "app/src/**/*.tsx"
+      instructions: >
+        In React components, focus on concrete bug risk and consistency with repo
+        patterns. Comment when useEffect usage appears unnecessary or risky, such as
+        syncing derived state, coordinating multiple effects, triggering event-driven
+        work after render, or fetching in ways that invite stale closures, render
+        loops, or lifecycle coupling. Prefer comments that suggest a simpler and
+        safer alternative. Do not comment on a single clearly justified effect.
+        Also flag direct API calls in components, bypassing required custom wrappers,
+        raw MUI DataGrid usage instead of CustomDataGrid, and hardcoded user-facing
+        strings that should use translation.
+
+    - path: "app/src/hooks/**"
+      instructions: >
+        For shared hooks, focus on concrete correctness risks: auth/session behavior,
+        request header propagation, subdomain handling, logout side effects,
+        localStorage cleanup blast radius, backend contract mismatches, and safe
+        async error handling. Prefer comments only for real bugs, regressions,
+        security issues, or compatibility risks, not naming or style.
+
+    - path: "app/src/features/**/hooks/**"
+      instructions: >
+        For feature hooks, focus on request/response compatibility, stale state,
+        race conditions, unsafe effect orchestration, and whether business logic or
+        API behavior can break feature workflows. Prefer practical bug-risk comments
+        over architecture suggestions.
+
+    - path: "app/src/layout/**"
+      instructions: >
+        Prioritize login/logout flow integrity, notification side effects, timers,
+        storage coupling, legacy-mode routing, redirects, and regressions that can
+        leave the app in an inconsistent session state. Call out missing tests when
+        risky behavior changes significantly.
+
+    - path: "app/src/layout/toolbar/TimerTimesheet.tsx"
+      instructions: >
+        Review for timer start/stop correctness, duplicate stop actions,
+        localStorage synchronization, navigation after stop, and user-visible
+        failure handling. Comment when changes can leave the timer running,
+        clear the wrong state, or misrepresent whether tracked time was persisted.
+
+    - path: "app/src/custom-components/UniversalCustomEmbed.tsx"
+      instructions: >
+        Review only for cross-window messaging safety, origin validation, iframe
+        sandbox permissions, navigation safety, logout/reset behavior, diagnostic
+        logging of security-sensitive events, and token exposure in URLs or browser
+        storage. Ignore presentational comments unless they mask a security or
+        correctness issue.
+
+    - path: "app/src/features/atti_ai/**"
+      instructions: >
+        Treat payload shape, upload/classification flow, token handling, and
+        multi-step wizard state as compatibility boundaries. Flag changes that can
+        break backend contracts, omit required fields, alter generation semantics,
+        lose uploaded content, or weaken token/error handling. Mention missing
+        regression coverage once if behavior changes materially.
+
+    - path: "app/src/**/timesheet/**"
+      instructions: >
+        Prioritize duration math, timezone and date-boundary handling,
+        agenda-to-timesheet matching, derived started_at and ended_at values,
+        zero-duration deletion behavior, and billing-facing regressions. Comment
+        when a change can misstate tracked time, cross-link entries to the wrong
+        day or item, or break payload expectations.
+
+    - path: "app/src/features/documents/**"
+      instructions: >
+        Focus on upload, download, delete, sign, destructive actions, backend
+        parameter compatibility, state loss, session-storage persistence, and
+        user-visible failure modes. Review modern and deprecated paths carefully.
+        Flag changes that can delete, misroute, mis-sign, download the wrong file,
+        or fail to persist document state. Mention missing regression coverage once
+        when behavior changes materially.
