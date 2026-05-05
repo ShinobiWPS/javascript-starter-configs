@@ -37,7 +37,7 @@ This is not intended to be used as is. Its just a reference. No install required
 
 👤 **Alexandru Gherasim**
 
-* Website: https://shinobiwps.gitlab.io
+* Website: [https://shinobiwps.dev](https://shinobiwps.dev)
 * Twitter: [@ShinobiWPS](https://twitter.com/ShinobiWPS)
 * Github: [@ShinobiWPS](https://github.com/ShinobiWPS)
 * LinkedIn: [@alexandrugherasim](https://linkedin.com/in/alexandrugherasim)
