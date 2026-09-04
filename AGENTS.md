@@ -11,10 +11,9 @@ Use `pnpm` for workspace commands.
 
 ## Where To Look Next
 
-- Dependency compatibility rules: `.github/instructions/dependency-compat.instructions.md`
-- TSX rules: `.github/instructions/tsx.instructions.md`
-- TypeScript rules: `.github/instructions/typescript.instructions.md`
-- Architecture reference: `.github/docs/architecture.md`
+- TSX rules: ``
+- TypeScript rules: ``
+- Architecture reference: ``
 
 If two instructions conflict, the more specific file should win.
 
