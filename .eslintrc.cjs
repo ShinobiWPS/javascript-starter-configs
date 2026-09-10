@@ -24,6 +24,7 @@ module.exports = {
     'import',
     '@stylistic',
   ],
+  // in case you don't wanna use Prettier,here some stylistic rules
   rules: {
     '@stylistic/indent': [
       'error',
