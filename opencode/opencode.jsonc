@@ -24,9 +24,10 @@
    - previous plausible fix failed;
    - investigations conflict.
    - Advisor must independently reason from raw evidence/reproduction, not trust the prior Luna diagnosis.
-   - No mandatory review after every implementation.
+   - No automatic review or review-like operation by default.
+   - A more specific project instruction, specification or ticket review gate overrides this global default.
    - Same-task regressions should be fixed in the same workflow.
-   - Review is only run when explicitly requested or otherwise intentionally invoked.
+   - Reviewer remains explicit unless a project rule requires review.
 
    SKILLS
    - Installed coding/reference skills should generally remain globally available so config does not need updating whenever skills are added.
@@ -46,7 +47,7 @@
    - scout: Luna/medium; external docs/dependencies/upstream research.
    - implementer: Luna/xhigh; scoped implementation.
    - debugger: Luna/xhigh; evidence-first diagnosis + fix.
-   - reviewer: Sol/high; explicit code review only.
+   - reviewer: Sol/high; review is explicit by default or required by project rules.
    - review-lane: Luna/high; narrow internal review axis.
    - advisor: Sol/high; independent hard-reasoning escalation, read-only.
    - wayfinder: Sol/high; large/foggy planning only.
@@ -74,7 +75,6 @@
    - `.env` read protection is intentionally preserved.
    */
    "$schema": "https://opencode.ai/config.json",
-
    "plugin": [
       "@simonwjackson/opencode-direnv",
       "opencode-ignore",
@@ -86,7 +86,6 @@
       "~/.config/opencode/plugin/shell-strategy/shell_strategy.md",
       "~/.config/opencode/rules/global-agents.md",
    ],
-
    "mcp": {
       "chrome-mcp-attach": {
          "enabled": true,
@@ -100,7 +99,6 @@
             "--log-file=/tmp/chrome-devtools-mcp-9222.log",
          ],
       },
-
       "chrome-mcp-new": {
          "enabled": true,
          "type": "local",
@@ -129,10 +127,8 @@
       "skill": "allow",
       "edit": "allow",
       "external_directory": "ask",
-
       "bash": {
          /* "*": "allow", */
-
          // Safe inspection
          "pwd": "allow",
          "ls *": "allow",
@@ -145,7 +141,6 @@
          "rg *": "allow",
          "which *": "allow",
          "command -v *": "allow",
-
          // Git read-only / low-risk
          "git status*": "allow",
          "git diff*": "allow",
@@ -156,7 +151,6 @@
          "git fetch*": "allow",
          "git pull*": "ask",
          "git ls-files*": "allow",
-
          // Git destructive / publishing actions
          "git push*": "ask",
          "git push --force*": "ask",
@@ -167,7 +161,6 @@
          "git rebase*": "ask",
          "git merge*": "ask",
          "git commit*": "ask",
-
          // JS/TS ecosystem
          /* "node *": "ask",
          "pnpm *": "ask",
@@ -175,9 +168,8 @@
          "npx *": "ask",
          "bun *": "ask",
          "yarn *": "ask", */
-
          // Common safe project commands
-        /*  "pnpm lint*": "allow",
+         /*  "pnpm lint*": "allow",
          "pnpm typecheck*": "allow",
          "pnpm test*": "allow",
          "pnpm vitest*": "allow",
@@ -185,14 +177,12 @@
          "pnpm exec tsc*": "allow",
          "pnpm exec eslint*": "allow",
          "pnpm exec biome*": "allow", */
-
          // Filesystem mutations
          "mkdir *": "ask",
          "mv *": "ask",
          "cp *": "ask",
          "rm *": "ask",
          "rm -rf *": "deny",
-
          // Network / install / infra should stay gated
          "curl *": "allow",
          "wget *": "ask",
@@ -201,21 +191,16 @@
          "supabase *": "ask",
       },
    },
-
    "agent": {
       "orchestrator": {
-         "description": "Default development coordinator. Understands the request, creates or validates a plan, explores local code and external dependencies, routes bounded implementation to implementer, non-obvious bugs to debugger, explicit reviews to reviewer, hard escalations to advisor, agent-tooling work to agent-tooling, and unusually large planning efforts to wayfinder.",
+         "description": "Default development coordinator. Understands the request, creates or validates a plan, explores local code and external dependencies, routes bounded implementation to implementer, non-obvious bugs to debugger, reviews when explicitly requested or required by more specific project rules to reviewer, hard escalations to advisor, agent-tooling work to agent-tooling, and unusually large planning efforts to wayfinder.",
          "mode": "primary",
-
          "model": "openai/gpt-5.6-luna",
          "reasoningEffort": "high",
          "textVerbosity": "low",
-
-         "prompt": "You are the development orchestrator. Do not perform implementation yourself. First understand the requested outcome. If implementation is requested and no sufficiently concrete plan/spec/ticket exists, create a concise plan with scope, constraints and acceptance criteria before delegation. Use explore for local repository investigation. Use scout for external libraries, dependencies, documentation and upstream implementation research. Treat reports of broken, failing, intermittent, regressed, or slow behavior as bugs. Route them to debugger unless the root cause is already demonstrated and the fix is bounded. Delegate normal code changes to implementer and provide the plan and acceptance criteria. Do not invoke reviewer automatically after implementation; use reviewer only when the user explicitly requests a review. If verification during the current task exposes a regression caused by the changes, route it back to implementer when the cause is clear or debugger otherwise, and verify the correction before finishing. Invoke advisor before a proposed fix when ANY of these holds: the bug involves concurrency, races, cache consistency, authentication, authorization, security, data integrity, or cross-cutting state; more than one materially different root-cause hypothesis survives targeted investigation; fixing it requires changing an architectural invariant or public contract; a previous plausible fix failed; or independent investigation produced conflicting conclusions. Do not invoke advisor merely because debugging is taking time. When invoking advisor, provide raw reproduction information, code, logs, tests and observations rather than only another agent's conclusion, and request an independent diagnosis that evaluates competing hypotheses. After advisor returns, send a bounded fix to implementer when root cause is established; otherwise return the evidence to debugger. Verify the original reproduction before finishing. Invoke wayfinder only when the effort is genuinely too large or unclear for one normal planning session, or when the user explicitly asks for wayfinding. Use agent-tooling for AGENTS.md, skills, OpenCode configuration, MCP tooling, agent prompts and other agent-facing tooling. Parallelize only genuinely independent work.",
-
+         "prompt": "You are the development orchestrator. Do not implement yourself. Existing-plan resume, status and what-next requests are report-only: name the next ready ticket, explain why it is next, state ownership and blockers, give a short long-term roadmap, and stop for approval. Dispatch only an explicitly approved named ticket. 'Continue' or 'proceed' approves only the currently named ticket, never a different or successor ticket. One approval authorizes exactly one ticket. After it completes, report the outcome and next frontier, then stop; never auto-dispatch a successor. Every implementation delegation must name the approved ticket and state that current user approval is present. If implementation is requested without a sufficiently concrete plan/spec/ticket, create a concise plan with scope, constraints and acceptance criteria before delegation. Use explore for local investigation and scout for external research. Route non-obvious bugs to debugger and use advisor for the established escalation triggers. Do not invoke review or review-like work automatically; reviewer remains explicit unless a more specific project instruction, specification or ticket requires review, which overrides this default. Route agent-tooling work to agent-tooling and report clearly at every approval boundary.",
          "permission": {
             "edit": "deny",
-
             "bash": {
                "*": "deny",
                "git status*": "allow",
@@ -224,12 +209,10 @@
                "git show*": "allow",
                "git merge-base*": "allow"
             },
-
             // The orchestrator routes to roles rather than running workflow skills itself.
             "skill": {
                "*": "deny"
             },
-
             "task": {
                "*": "deny",
                "explore": "allow",
@@ -241,7 +224,6 @@
                "wayfinder": "allow",
                "agent-tooling": "allow"
             },
-
             "external_directory": "ask"
          }
       },
@@ -250,7 +232,6 @@
          "model": "openai/gpt-5.6-luna",
          "reasoningEffort": "medium",
          "textVerbosity": "low",
-
          "permission": {
             "skill": {
                "*": "deny"
@@ -262,7 +243,6 @@
          "model": "openai/gpt-5.6-luna",
          "reasoningEffort": "medium",
          "textVerbosity": "low",
-
          "permission": {
             "skill": {
                "*": "deny"
@@ -273,16 +253,12 @@
       "debugger": {
          "description": "Bug diagnosis and repair specialist. Use for non-obvious bugs, intermittent failures, regressions, performance problems, or bugs whose root cause is not already demonstrated. Builds a reproducible feedback loop and establishes root cause before fixing.",
          "mode": "subagent",
-
          "model": "openai/gpt-5.6-luna",
          "reasoningEffort": "xhigh",
          "textVerbosity": "low",
-
          "prompt": "Load the `diagnosing-bugs` skill before starting and follow its evidence-first debugging workflow. Do not jump from symptoms directly to a fix. Escalation is based on observable conditions, not your confidence. Stop before applying the fix and return ADVISOR_REQUIRED when ANY of these holds: the bug involves concurrency, races, cache consistency, authentication, authorization, security, data integrity, or cross-cutting state; more than one materially different root-cause hypothesis survives targeted investigation; fixing it requires changing an architectural invariant or public contract; a previous plausible fix failed; or independent investigation produced conflicting conclusions. When returning ADVISOR_REQUIRED, include the reproduction command, raw observations/logs/tests, relevant code locations, surviving hypotheses, failed attempts and affected architectural boundaries. Otherwise establish the root cause, implement the smallest source-level fix consistent with project instructions, run focused regression verification, and return DEBUG_COMPLETE with changed files, evidence for the diagnosis and verification performed.",
-
          "permission": {
             "task": "deny",
-
             "external_directory": {
                "*": "ask",
                "~/.agents/skills/**": "allow",
@@ -291,44 +267,35 @@
          }
       },
       "implementer": {
-        "description": "Implementation specialist. Use whenever a concrete plan, spec, ticket or well-scoped coding task needs to be implemented, including features, fixes, refactors and tests. Do not use for planning-only work or code review.",
-        "mode": "subagent",
-
-        "model": "openai/gpt-5.6-luna",
-        "reasoningEffort": "xhigh",
-        "textVerbosity": "low",
-
-        "prompt": "You are the implementation specialist. Before implementing, load the `implement` skill using the skill tool. A concrete plan, spec, ticket or acceptance criteria should normally have been supplied by the parent. If none exists, DO NOT start editing: return PLAN_REQUIRED. Stay within the delegated scope and avoid unrelated refactors.",
-
-        "permission": {
-          "edit": {
-            "*": "allow",
-            "~/.agents/skills/**": "deny",
-            "~/.config/opencode/skills/**": "deny"
-          },
-
-          "task": "deny",
-
-          "external_directory": {
-            "*": "ask",
-            "~/.agents/skills/**": "allow",
-            "~/.config/opencode/skills/**": "allow"
-          }
-        }
+         "description": "Implementation specialist. Use whenever a concrete plan, spec, ticket or well-scoped coding task needs to be implemented, including features, fixes, refactors and tests. Do not use for planning-only work or code review.",
+         "mode": "subagent",
+         "model": "openai/gpt-5.6-luna",
+         "reasoningEffort": "xhigh",
+         "textVerbosity": "low",
+         "prompt": "You are the implementation specialist. Before implementing, load the `implement` skill using the skill tool. The parent delegation must clearly identify exactly one approved ticket and state that current user approval is present. If either is absent, or the task is resume/status-only, do not edit and return WAITING_FOR_APPROVAL. If no concrete plan/spec/ticket or acceptance criteria exists, do not edit and return PLAN_REQUIRED. Implement exactly the approved ticket, stay within its scope, avoid unrelated refactors, and stop after completion; never select or start another ticket.",
+         "permission": {
+            "edit": {
+               "*": "allow",
+               "~/.agents/skills/**": "deny",
+               "~/.config/opencode/skills/**": "deny"
+            },
+            "task": "deny",
+            "external_directory": {
+               "*": "ask",
+               "~/.agents/skills/**": "allow",
+               "~/.config/opencode/skills/**": "allow"
+            }
+         }
       },
       "reviewer": {
-         "description": "Dedicated code reviewer. Use only when the user explicitly requests review of changes, a branch, diff or PR. Reviews correctness, repository standards and conformance to the originating specification without modifying code.",
+         "description": "Dedicated code reviewer. Use when review is explicitly requested or required by project instructions, specification or ticket; no automatic review by default. Reviews correctness, repository standards and conformance to the originating specification without modifying code.",
          "mode": "subagent",
-
          "model": "openai/gpt-5.6-sol",
          "reasoningEffort": "high",
          "textVerbosity": "low",
-
          "prompt": "You are the dedicated code-review coordinator. Before reviewing, load the `code-review` skill using the skill tool and follow its Standards and Spec review process. Never modify source code. When code-review requires independent parallel review axes, delegate those bounded analyses to review-lane subagents: one Standards lane and one Spec lane. Synthesize and de-duplicate their findings yourself. Use other installed reference skills when they materially improve the review. Return only actionable findings, prioritized by severity, with file/location, why it matters, and the required correction. If there are no material findings, state REVIEW_PASSED explicitly.",
-
          "permission": {
             "edit": "deny",
-
             "bash": {
                "*": "deny",
                "git status*": "allow",
@@ -337,12 +304,10 @@
                "git show*": "allow",
                "git merge-base*": "ask"
             },
-
             "task": {
                "*": "deny",
                "review-lane": "allow"
             },
-
             "external_directory": {
                "*": "ask",
                "~/.agents/skills/**": "allow",
@@ -351,49 +316,39 @@
          }
       },
       "review-lane": {
-        "description": "Internal read-only review worker used by reviewer for one independent review axis such as Standards or Spec. Never implement or modify code.",
-        "mode": "subagent",
-        "hidden": true,
-
-        "model": "openai/gpt-5.6-luna",
-        "reasoningEffort": "high",
-        "textVerbosity": "low",
-
-        "prompt": "Perform only the review axis assigned by the parent reviewer. Inspect the relevant diff, source, tests, repository instructions and specification evidence. Do not modify anything. Report concrete findings with file/location and evidence. Do not expand into unrelated review concerns.",
-
-        "permission": {
-          "edit": "deny",
-
-          "bash": {
-            "*": "deny",
-            "git status*": "allow",
-            "git diff*": "allow",
-            "git log*": "allow",
-            "git show*": "allow",
-            "git merge-base*": "ask"
-          },
-
-          "skill": {
-            "*": "deny"
-          },
-
-          "task": "deny",
-          "external_directory": "ask"
-        }
+         "description": "Internal read-only review worker used by reviewer for one independent review axis such as Standards or Spec. Never implement or modify code.",
+         "mode": "subagent",
+         "hidden": true,
+         "model": "openai/gpt-5.6-luna",
+         "reasoningEffort": "high",
+         "textVerbosity": "low",
+         "prompt": "Perform only the review axis assigned by the parent reviewer. Inspect the relevant diff, source, tests, repository instructions and specification evidence. Do not modify anything. Report concrete findings with file/location and evidence. Do not expand into unrelated review concerns.",
+         "permission": {
+            "edit": "deny",
+            "bash": {
+               "*": "deny",
+               "git status*": "allow",
+               "git diff*": "allow",
+               "git log*": "allow",
+               "git show*": "allow",
+               "git merge-base*": "ask"
+            },
+            "skill": {
+               "*": "deny"
+            },
+            "task": "deny",
+            "external_directory": "ask"
+         }
       },
       "advisor": {
          "description": "High-capability read-only expert for deterministic escalations involving difficult architecture, debugging or design trade-offs. Produces an independent diagnosis/recommendation from raw evidence rather than trusting another agent's conclusion.",
          "mode": "subagent",
-
          "model": "openai/gpt-5.6-sol",
          "reasoningEffort": "high",
          "textVerbosity": "low",
-
          "prompt": "Act as an independent senior technical advisor. Do not assume the parent or debugger diagnosis is correct. Start from the supplied reproduction, relevant code, logs, tests and observations. Independently determine the most likely root cause or architectural issue, explicitly evaluate competing hypotheses, distinguish evidence from inference, and recommend the safest source-level fix plus a verification strategy. Do not implement the solution and do not broaden the task unnecessarily.",
-
          "permission": {
             "edit": "deny",
-
             "bash": {
                "*": "deny",
                "git status*": "allow",
@@ -401,11 +356,9 @@
                "git log*": "allow",
                "git show*": "allow"
             },
-
             "skill": {
                "*": "deny"
             },
-
             "task": "deny",
             "external_directory": "ask"
          }
@@ -413,20 +366,15 @@
       "wayfinder": {
          "description": "Large-scale planning specialist. Use only for genuinely large, foggy efforts whose route cannot fit into one normal planning session, or when the user explicitly asks to use Matt Pocock's wayfinder workflow. Plans and resolves decisions; it does not implement the destination.",
          "mode": "subagent",
-
          "model": "openai/gpt-5.6-sol",
          "reasoningEffort": "high",
          "textVerbosity": "low",
-
          "prompt": "Before doing anything else, load the wayfinder skill. Follow it as the controlling workflow. This role plans and resolves decisions; it does not implement the destination. Load its supporting skills only when the wayfinder workflow requires them. Use explore for local repository facts and scout for external dependencies/docs instead of asking the user for discoverable information.",
-
          "permission": {
             // Wayfinder may update CONTEXT.md/ADRs or a local Markdown issue tracker.
             "edit": "allow",
-
             // Tracker operations can be consequential, so ask.
             "bash": "ask",
-
             "skill": {
                "*": "deny",
                "wayfinder": "allow",
@@ -435,13 +383,11 @@
                "prototype": "allow",
                "research": "allow"
             },
-
             "task": {
                "*": "deny",
                "explore": "allow",
                "scout": "allow"
             },
-
             "external_directory": {
                "*": "ask",
                "~/.agents/skills/**": "allow",
@@ -452,13 +398,10 @@
       "agent-tooling": {
          "description": "Creates or updates agent-facing tooling and instructions: AGENTS.md/CLAUDE.md, OpenCode configuration, skills, agent prompts, MCP tooling, skill discovery/scanning and related agent infrastructure.",
          "mode": "subagent",
-
          "model": "openai/gpt-5.6-luna",
          "reasoningEffort": "medium",
          "textVerbosity": "low",
-
          "prompt": "You are the agent-tooling specialist. Select and load the installed agent-tooling skill that matches the task, including `agents-md`, `writing-for-agents`, `customize-opencode`, `find-skills`, `skill-scanner`, `mcp-builder`, or `setup-matt-pocock-skills` when relevant. For agent-facing prose or instructions, use `writing-for-agents` as the governing reference. Preserve existing project and OpenCode conventions, minimize unnecessary instruction/context load, and do not perform unrelated application-code work.",
-
          "permission": {
             "edit": "allow",
             "task": "deny",
@@ -466,7 +409,6 @@
          }
       },
    },
-
    "command": {
       "usage": {
          "model": "openai/gpt-5.6-luna",
@@ -485,7 +427,6 @@
          "agent": "build",
          "template": "Run the project's normal verification flow: lint, typecheck, and tests where available. Prefer pnpm. Explain failures clearly and propose the smallest safe fix.",
       },
-
       "default-commit-message": {
          "description": "Generate a conventional commit message",
          "template": "Inspect the current staged diff and generate a conventional commit message. Use imperative mood. Keep the subject under 50 characters when possible. Use one of: feat, fix, docs, style, refactor, perf, test, chore, ci. Include scope when obvious.",
