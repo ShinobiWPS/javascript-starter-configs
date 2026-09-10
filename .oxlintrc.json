@@ -1,4 +1,30 @@
 {
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": [
+		"eslint",
+		"typescript",
+		"unicorn",
+		"oxc",
+		"react",
+		"import",
+		"jsx-a11y"
+	],
+	"jsPlugins": [
+		"@tanstack/eslint-plugin-query",
+		"@tanstack/eslint-plugin-router",
+		"@eslint-react/eslint-plugin"
+	],
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn",
+		"perf": "warn"
+	},
+	"options": {
+		"typeAware": true
+	},
+	"env": {
+		"builtin": true
+	},
 	"ignorePatterns": [
 		"dist",
 		".vinxi",
@@ -6,30 +32,108 @@
 		".vercel",
 		".netlify",
 		".output",
-		"build"
-	],
-	"categories": {
-		"correctness": "error"
-	},
-	"plugins": [
-		"typescript",
-		"react"
+		".tanstack",
+		"build/",
+		"coverage/",
+		"node_modules/",
+		"**/*.gen.ts",
+		"**/*.gen.tsx",
+		"**/routeTree.gen.ts"
 	],
 	"rules": {
-		// React and Hooks rules
-		"react-hooks/rules-of-hooks": "error",
-		"react-hooks/exhaustive-deps": "warn",
+		"no-case-declarations": "error",
+		"no-empty": "error",
+		"no-fallthrough": "error",
+		"no-prototype-builtins": "error",
+		"no-regex-spaces": "error",
+		"no-unexpected-multiline": "error",
+		"preserve-caught-error": "error",
+		"no-var": "error",
+		"prefer-const": "error",
+		"prefer-rest-params": "error",
+		"prefer-spread": "error",
+		"no-array-constructor": "error",
+		"typescript/ban-ts-comment": "error",
+		"typescript/no-empty-object-type": "error",
+		"typescript/no-namespace": "error",
+		"typescript/no-require-imports": "error",
+		"typescript/no-unnecessary-type-constraint": "error",
+		"typescript/no-unsafe-function-type": "error",
+		"typescript/no-misused-promises": "error",
 		"react/react-in-jsx-scope": "off",
-		"react/jsx-uses-react": "off",
-		// TypeScript specific rules
-		"typescript/no-explicit-any": "warn",
-		"typescript/no-unused-vars": "warn",
-		// General rules
-		"no-console": "warn",
-		"no-debugger": "warn",
-		// additional rules
-		"no-await-in-loop": "warn",
-		"require-await": "warn",
-		"no-return-await": "error"
-	}
+		"react/rules-of-hooks": "error",
+		"react/exhaustive-deps": "warn",
+		"react/hook-use-state": "error",
+		"react/purity": "warn",
+		"react/set-state-in-effect": "warn",
+		"react/unsupported-syntax": "error",
+		"react/no-clone-element": "warn",
+		"react/no-danger": "warn",
+		"react/no-react-children": "warn",
+		"react/no-unsafe": [
+			"error",
+			{
+				"checkAliases": true
+			}
+		],
+		"react/no-namespace": "error",
+		"@tanstack/query/prefer-query-options": "warn",
+		"@tanstack/query/exhaustive-deps": "error",
+		"@tanstack/query/no-rest-destructuring": "warn",
+		"@tanstack/query/stable-query-client": "error",
+		"@tanstack/query/no-unstable-deps": "error",
+		"@tanstack/query/infinite-query-property-order": "error",
+		"@tanstack/query/no-void-query-fn": "error",
+		"@tanstack/query/mutation-property-order": "error",
+		"@tanstack/router/create-route-property-order": "warn",
+		"@tanstack/router/route-param-names": "error",
+		"@eslint-react/no-access-state-in-setstate": "error",
+		"@eslint-react/no-context-provider": "warn",
+		"@eslint-react/no-forward-ref": "warn",
+		"@eslint-react/no-create-ref": "error",
+		"@eslint-react/no-use-context": "warn",
+		"@eslint-react/no-unnecessary-use-prefix": "warn",
+		"@eslint-react/no-unused-class-component-members": "warn",
+		"@eslint-react/no-nested-lazy-component-declarations": "error",
+		"@eslint-react/jsx-no-leaked-dollar": "warn",
+		"@eslint-react/jsx-no-leaked-semicolon": "warn",
+		"@eslint-react/rsc-function-definition": "error",
+		"@eslint-react/dom-no-flush-sync": "error",
+		"@eslint-react/dom-no-hydrate": "error",
+		"@eslint-react/dom-no-render": "error",
+		"@eslint-react/dom-no-unsafe-iframe-sandbox": "warn",
+		"@eslint-react/dom-no-use-form-state": "error",
+		"@eslint-react/web-api-no-leaked-event-listener": "warn",
+		"@eslint-react/web-api-no-leaked-fetch": "warn",
+		"@eslint-react/web-api-no-leaked-intersection-observer": "warn",
+		"@eslint-react/web-api-no-leaked-interval": "warn",
+		"@eslint-react/web-api-no-leaked-resize-observer": "warn",
+		"@eslint-react/web-api-no-leaked-timeout": "warn",
+		"@eslint-react/no-leaked-conditional-rendering": "error"
+	},
+	"overrides": [
+		{
+			"files": [
+				"**/*.{ts,tsx,mts,cts}"
+			],
+			"rules": {
+				"constructor-super": "off",
+				"getter-return": "off",
+				"no-class-assign": "off",
+				"no-const-assign": "off",
+				"no-dupe-class-members": "off",
+				"no-dupe-keys": "off",
+				"no-func-assign": "off",
+				"no-import-assign": "off",
+				"no-new-native-nonconstructor": "off",
+				"no-obj-calls": "off",
+				"no-redeclare": "off",
+				"no-setter-return": "off",
+				"no-this-before-super": "off",
+				"no-unreachable": "off",
+				"no-unsafe-negation": "off",
+				"no-with": "off"
+			}
+		}
+	]
 }
