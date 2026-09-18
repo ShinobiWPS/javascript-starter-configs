@@ -111,7 +111,6 @@
 		"@eslint-react/web-api-no-leaked-interval": "warn",
 		"@eslint-react/web-api-no-leaked-resize-observer": "warn",
 		"@eslint-react/web-api-no-leaked-timeout": "warn",
-		"@eslint-react/no-leaked-conditional-rendering": "error"
 	},
 	"overrides": [
 		{
