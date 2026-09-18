@@ -100,8 +100,6 @@
 		"@eslint-react/jsx-no-leaked-semicolon": "warn",
 		"@eslint-react/rsc-function-definition": "error",
 		"@eslint-react/dom-no-flush-sync": "error",
-		"@eslint-react/dom-no-hydrate": "error",
-		"@eslint-react/dom-no-render": "error",
 		"@eslint-react/dom-no-unsafe-iframe-sandbox": "warn",
 		"@eslint-react/dom-no-use-form-state": "error",
 		"@eslint-react/web-api-no-leaked-event-listener": "warn",
