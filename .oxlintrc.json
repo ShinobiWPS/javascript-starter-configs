@@ -12,7 +12,10 @@
 	"jsPlugins": [
 		"@tanstack/eslint-plugin-query",
 		"@tanstack/eslint-plugin-router",
-		"@eslint-react/eslint-plugin"
+		{
+			"name": "@eslint-react",
+			"specifier": "./tools/eslint-react-plugin/index.mjs"
+		}
 	],
 	"categories": {
 		"correctness": "error",

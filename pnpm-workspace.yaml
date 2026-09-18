@@ -1,3 +1,9 @@
+packages:
+   - custom-packages/*
+
 allowBuilds:
-  '@biomejs/biome': set this to true or false
-  simple-git-hooks: set this to true or false
+   esbuild: true
+   sharp: true
+   workerd: true
+   '@biomejs/biome': set this to true or false
+   simple-git-hooks: set this to true or false

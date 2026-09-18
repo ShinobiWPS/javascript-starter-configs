@@ -1,0 +1,9 @@
+{
+	"name": "@local/eslint-react-plugin",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"@eslint-react/eslint-plugin": "5.19.1",
+		"typescript": "6.0.2"
+	}
+}
